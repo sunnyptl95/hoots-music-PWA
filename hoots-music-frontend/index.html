@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Hoots</title>
+<meta name="theme-color" content="#0B0E17" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- Ambient background glow -->
+<div class="bg-glow" aria-hidden="true"></div>
+
+<!-- ============ AUTH VIEW ============ -->
+<section id="auth-view" class="auth-view">
+  <div class="auth-card">
+    <div class="brand">
+      <img src="icons/icon-192.png" alt="" class="brand-owl" />
+      <span class="brand-word">HOOTS</span>
+    </div>
+    <p class="auth-tagline">Your library. Your late nights. Your sound.</p>
+
+    <div class="auth-tabs" id="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Log in</button>
+      <button class="auth-tab" data-tab="signup">Sign up</button>
+    </div>
+
+    <form id="login-form" class="auth-form active">
+      <label>Email
+        <input type="email" id="login-email" required autocomplete="email" />
+      </label>
+      <label>Password
+        <input type="password" id="login-password" required autocomplete="current-password" />
+      </label>
+      <p class="auth-error" id="login-error"></p>
+      <p class="hint hidden" id="login-resend-hint">
+        <button type="button" id="login-resend-btn" class="link-btn">Resend verification email</button>
+      </p>
+      <button type="submit" class="btn-primary">Log in</button>
+      <button type="button" id="forgot-link" class="link-btn">Forgot password?</button>
+    </form>
+
+    <form id="forgot-form" class="auth-form">
+      <label>Email
+        <input type="email" id="forgot-email" required autocomplete="email" />
+      </label>
+      <p class="auth-error" id="forgot-error"></p>
+      <p class="hint" id="forgot-success"></p>
+      <button type="submit" class="btn-primary">Send reset link</button>
+      <button type="button" id="back-to-login-link" class="link-btn">Back to log in</button>
+    </form>
+
+    <form id="reset-form" class="auth-form">
+      <label>New password
+        <input type="password" id="reset-password" required minlength="6" autocomplete="new-password" />
+      </label>
+      <p class="auth-error" id="reset-error"></p>
+      <button type="submit" class="btn-primary">Update password</button>
+    </form>
+
+    <form id="signup-form" class="auth-form">
+      <label>Full name
+        <input type="text" id="signup-name" required autocomplete="name" maxlength="60" />
+      </label>
+      <label>Email
+        <input type="email" id="signup-email" required autocomplete="email" />
+      </label>
+      <label>Password
+        <input type="password" id="signup-password" required minlength="6" autocomplete="new-password" />
+      </label>
+      <p class="auth-error" id="signup-error"></p>
+      <button type="submit" class="btn-primary">Create account</button>
+    </form>
+
+    <div id="pending-verification" class="auth-form pending-verify">
+      <div class="pending-icon">📩</div>
+      <h2 class="pending-title">Check your email</h2>
+      <p class="hint" id="pending-verify-text">We sent a verification link — confirm it to log in.</p>
+      <p class="hint" id="pending-dev-link"></p>
+      <button type="button" id="pending-resend-btn" class="btn-ghost">Resend link</button>
+      <button type="button" id="pending-back-btn" class="link-btn">Back to log in</button>
+    </div>
+
+    <div class="auth-divider" id="auth-divider"><span>or</span></div>
+    <button id="google-login-btn" class="btn-google">Continue with Google</button>
+  </div>
+</section>
+
+<!-- ============ APP VIEW ============ -->
+<div id="app-view" class="app-view">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand brand-sm">
+      <img src="icons/icon-192.png" alt="" class="brand-owl-sm" />
+      <span class="brand-word">HOOTS</span>
+    </div>
+
+    <nav class="nav-links">
+      <button class="nav-link active" data-view="home">Home</button>
+      <button class="nav-link" data-view="search">Search</button>
+      <button class="nav-link" data-view="library">Your Library</button>
+      <button class="nav-link admin-only hidden" data-view="admin">Admin</button>
+    </nav>
+
+    <div class="playlist-section">
+      <div class="playlist-header">
+        <span>Playlists</span>
+        <button id="new-playlist-btn" class="icon-btn" title="New playlist">+</button>
+      </div>
+      <ul id="playlist-list" class="playlist-list"></ul>
+    </div>
+
+    <button id="logout-btn" class="btn-ghost logout-btn">Log out</button>
+  </aside>
+  <div id="sidebar-backdrop" class="sidebar-backdrop hidden"></div>
+
+  <!-- Main content -->
+  <main class="main-content">
+    <header class="topbar">
+      <button id="hamburger-btn" class="hamburger-btn" title="Menu">☰</button>
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="Search songs, artists…" autocomplete="off" />
+        <button id="search-clear-btn" class="search-clear-btn hidden" title="Clear search">×</button>
+      </div>
+      <button id="profile-btn" class="profile-pill">
+        <span id="profile-name">—</span>
+      </button>
+    </header>
+
+    <!-- HOME VIEW -->
+    <section id="view-home" class="view-panel active">
+      <div id="home-sections"></div>
+    </section>
+
+    <!-- SEARCH VIEW -->
+    <section id="view-search" class="view-panel">
+      <h1 class="view-title">Search</h1>
+      <div id="search-history"></div>
+      <p class="hint" id="search-hint">Search for songs and artists above.</p>
+      <ul id="results-list" class="song-list"></ul>
+    </section>
+
+    <!-- LIBRARY VIEW -->
+    <section id="view-library" class="view-panel">
+      <h1 class="view-title" id="library-title">Your Library</h1>
+      <p id="library-hint" class="hint">Pick a playlist on the left, or make a new one.</p>
+      <ul id="library-list" class="song-list"></ul>
+    </section>
+
+    <!-- ADMIN VIEW -->
+    <section id="view-admin" class="view-panel">
+      <h1 class="view-title">Admin</h1>
+
+      <div class="admin-block">
+        <h2>Overview</h2>
+        <div class="analytics-grid">
+          <div class="stat-box"><span class="stat-value" id="an-total-users">—</span><span class="stat-label">Total users</span></div>
+          <div class="stat-box"><span class="stat-value" id="an-active-week">—</span><span class="stat-label">Active this week</span></div>
+          <div class="stat-box"><span class="stat-value" id="an-new-today">—</span><span class="stat-label">New today</span></div>
+          <div class="stat-box"><span class="stat-value" id="an-total-plays">—</span><span class="stat-label">Total plays</span></div>
+          <div class="stat-box"><span class="stat-value" id="an-total-playlists">—</span><span class="stat-label">Playlists made</span></div>
+        </div>
+        <div class="analytics-cols">
+          <div>
+            <h3 class="analytics-subhead">Top songs</h3>
+            <ol id="an-top-songs" class="analytics-list"></ol>
+          </div>
+          <div>
+            <h3 class="analytics-subhead">Top artists</h3>
+            <ol id="an-top-artists" class="analytics-list"></ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-block">
+        <h2>Ad settings</h2>
+        <div class="admin-row">
+          <label>Max ads / day (per user)
+            <input type="number" id="ad-max" min="0" max="20" />
+          </label>
+          <button id="save-ad-config" class="btn-primary btn-sm">Save</button>
+        </div>
+
+        <h3 class="analytics-subhead" style="margin-top:20px;">Ads (one is picked at random each time)</h3>
+        <ul id="ads-list" class="user-list"></ul>
+        <div class="admin-row" style="margin-top:12px;">
+          <select id="new-ad-type">
+            <option value="video">Video</option>
+            <option value="audio">Audio</option>
+            <option value="vast">VAST tag (real ad network)</option>
+          </select>
+          <input type="text" id="new-ad-url" placeholder="https://.../ad.mp4 or VAST tag URL" style="flex:1; min-width:220px;" />
+          <button id="add-ad-btn" class="btn-primary btn-sm">Add ad</button>
+        </div>
+      </div>
+
+      <div class="admin-block">
+        <h2>Featured playlists <span class="hint" style="display:inline;">(shown to every user on Home)</span></h2>
+        <ul id="featured-playlists-list" class="user-list"></ul>
+        <div class="admin-row" style="margin-top:12px;">
+          <input type="text" id="new-featured-name" placeholder="Playlist name" style="flex:1; min-width:180px;" />
+          <button id="add-featured-btn" class="btn-primary btn-sm">Create</button>
+        </div>
+        <div class="admin-row" style="margin-top:16px;">
+          <select id="featured-target-select"></select>
+          <div class="mini-search-wrap" style="flex:1; min-width:200px;">
+            <input type="text" id="featured-search-input" class="mini-search-input" placeholder="Search a song to add…" />
+            <button id="featured-search-clear" class="search-clear-btn hidden" title="Clear">×</button>
+          </div>
+          <button id="featured-search-btn" class="btn-primary btn-sm">Search</button>
+        </div>
+        <ul id="featured-search-results" class="song-list"></ul>
+      </div>
+
+      <div class="admin-block">
+        <h2>Users</h2>
+        <div class="mini-search-wrap" style="max-width:320px; margin-bottom:12px;">
+          <input type="text" id="admin-user-search" class="mini-search-input" placeholder="Search by email…" />
+          <button id="admin-user-search-clear" class="search-clear-btn hidden" title="Clear">×</button>
+        </div>
+        <ul id="admin-user-list" class="user-list"></ul>
+      </div>
+    </section>
+    <!-- PROFILE VIEW -->
+    <section id="view-profile" class="view-panel">
+      <h1 class="view-title">Profile</h1>
+      <div class="profile-card">
+        <div class="profile-avatar" id="profile-avatar">O</div>
+        <div class="profile-info">
+          <span class="profile-info-name" id="profile-view-name">—</span>
+          <span class="profile-info-email" id="profile-view-email">—</span>
+          <span class="profile-badge" id="profile-verified-badge"></span>
+          <span class="profile-member-since" id="profile-member-since"></span>
+        </div>
+      </div>
+
+      <div class="profile-stats">
+        <div class="stat-box">
+          <span class="stat-value" id="stat-playtime">—</span>
+          <span class="stat-label">Time listened</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value" id="stat-songs">—</span>
+          <span class="stat-label">Songs played</span>
+        </div>
+      </div>
+
+      <button id="profile-resend-btn" class="btn-ghost hidden">Resend verification email</button>
+
+      <div class="profile-section" id="edit-name-section">
+        <div class="profile-section-header">
+          <h2>Name</h2>
+          <button id="toggle-edit-name-btn" class="link-btn">Edit</button>
+        </div>
+        <form id="edit-name-form" class="auth-form">
+          <label>Display name
+            <input type="text" id="edit-name-input" required maxlength="60" />
+          </label>
+          <p class="auth-error" id="edit-name-error"></p>
+          <p class="hint" id="edit-name-success"></p>
+          <button type="submit" class="btn-primary btn-sm">Save name</button>
+        </form>
+      </div>
+
+      <div class="profile-section" id="change-password-section">
+        <div class="profile-section-header">
+          <h2>Password</h2>
+          <button id="toggle-change-password-btn" class="link-btn">Change</button>
+        </div>
+        <form id="change-password-form" class="auth-form">
+          <label>Current password
+            <input type="password" id="current-password" required autocomplete="current-password" />
+          </label>
+          <label>New password
+            <input type="password" id="new-password" required minlength="6" autocomplete="new-password" />
+          </label>
+          <p class="auth-error" id="change-password-error"></p>
+          <p class="hint" id="change-password-success"></p>
+          <button type="submit" class="btn-primary btn-sm">Update password</button>
+        </form>
+      </div>
+
+      <button id="profile-logout-btn" class="btn-primary btn-sm logout-danger">Log out</button>
+
+      <div class="profile-footer">
+        <button id="legal-link" class="link-btn">Privacy Policy & Terms of Service</button>
+        <span class="app-version">Hoots v1.6.0</span>
+      </div>
+    </section>
+
+    <!-- LEGAL VIEW -->
+    <section id="view-legal" class="view-panel">
+      <button id="legal-back-btn" class="link-btn legal-back">← Back to Profile</button>
+      <h1 class="view-title">Legal</h1>
+      <div class="legal-tabs">
+        <button class="legal-tab active" data-legal="privacy">Privacy Policy</button>
+        <button class="legal-tab" data-legal="terms">Terms of Service</button>
+      </div>
+
+      <div id="legal-privacy" class="legal-content active">
+        <p class="legal-updated">Last updated: August 2026</p>
+        <h3>What we collect</h3>
+        <p>Your name and email (to run your account), the songs you play and search for (to power recommendations), and basic device/session info (to keep you logged in and show login history).</p>
+        <h3>How we use it</h3>
+        <p>To run playback, build your "Recommended for you" and "Trending" feeds, save your playlists, and show ads at the frequency you've configured — never sold to third parties.</p>
+        <h3>Third parties</h3>
+        <p>Google (if you sign in with Google) and YouTube (audio is sourced from YouTube — see our Terms for details). We don't use third-party ad-tracking networks unless one is explicitly configured by the app owner.</p>
+        <h3>Your data</h3>
+        <p>You can change your password, resend verification, or log out anytime from Profile. To delete your account or data, contact the app owner directly.</p>
+        <h3>Cookies & local storage</h3>
+        <p>We use browser local storage to keep you signed in and remember your last-played song — not for tracking across other sites.</p>
+        <h3>Children</h3>
+        <p>This app isn't directed at children under 13, and we don't knowingly collect their data.</p>
+      </div>
+
+      <div id="legal-terms" class="legal-content">
+        <p class="legal-updated">Last updated: August 2026</p>
+        <h3>Using Hoots</h3>
+        <p>You need an account to stream. Keep your login secure — you're responsible for activity on your account. Don't attempt to abuse, scrape, or overload the service.</p>
+        <h3>Content source</h3>
+        <p>Audio is retrieved from YouTube for personal listening. We don't own or claim rights to this content; it belongs to its original creators/rightsholders.</p>
+        <h3>Ads</h3>
+        <p>Ads may play between songs, limited to a daily cap the app owner sets. Ad-free access may be granted to specific accounts at the owner's discretion.</p>
+        <h3>Accounts & termination</h3>
+        <p>Accounts found abusing the service (fake signups, scraping, harassment) may be suspended without notice.</p>
+        <h3>No warranty</h3>
+        <p>This app is provided "as is," with no guarantee of uninterrupted playback or availability. Streaming sources can change or break without notice.</p>
+        <h3>Changes</h3>
+        <p>These terms may be updated as the app evolves — check back occasionally.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Mobile bottom nav -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="bottom-nav-btn active" data-view="home">
+      <span class="bn-icon">⌂</span><span>Home</span>
+    </button>
+    <button class="bottom-nav-btn" data-view="search">
+      <span class="bn-icon">🔍</span><span>Search</span>
+    </button>
+    <button class="bottom-nav-btn" data-view="library">
+      <span class="bn-icon">☰</span><span>Library</span>
+    </button>
+    <button class="bottom-nav-btn" data-view="profile">
+      <span class="bn-icon">☺</span><span>Profile</span>
+    </button>
+  </nav>
+
+  <!-- Playlist picker popover -->
+  <div id="playlist-picker" class="playlist-picker hidden">
+    <div class="playlist-picker-header">Add to playlist</div>
+    <ul id="playlist-picker-list"></ul>
+  </div>
+
+  <!-- Onboarding: full-screen taste picker, shown on first entry until completed -->
+  <div id="onboarding-view" class="onboarding-view hidden">
+    <div class="brand onboarding-brand">
+      <img src="icons/icon-192.png" alt="" class="brand-owl-sm" />
+      <span class="brand-word">HOOTS</span>
+    </div>
+    <h1 class="onboarding-title">What do you like?</h1>
+    <p class="hint">Pick a few genres — helps us recommend better. You can skip this.</p>
+    <div id="genre-chips" class="chip-row"></div>
+    <div class="onboarding-actions">
+      <button id="onboarding-skip" class="btn-ghost">Skip</button>
+      <button id="onboarding-save" class="btn-primary">Continue</button>
+    </div>
+  </div>
+
+  <!-- Ad overlay — no skip control by design -->
+  <div id="ad-overlay" class="ad-overlay hidden">
+    <div class="ad-card">
+      <span class="ad-label">Ad · supports Hoots</span>
+      <div id="ad-content" class="ad-content"></div>
+    </div>
+  </div>
+
+  <!-- Full-screen Now Playing -->
+  <div id="now-playing-view" class="now-playing-view hidden">
+    <img id="np-backdrop" class="np-backdrop" alt="" />
+    <button id="np-close-btn" class="np-close" title="Close">⌄</button>
+
+    <div class="np-art-wrap">
+      <img id="np-art" class="np-art" alt="" />
+    </div>
+    <div class="np-meta">
+      <span id="np-title" class="np-title">Nothing playing</span>
+      <span id="np-artist" class="np-artist">—</span>
+    </div>
+
+    <div class="np-progress">
+      <span id="np-time-current" class="time">0:00</span>
+      <input type="range" id="np-seek-bar" class="seek-input" min="0" max="100" value="0" />
+      <span id="np-time-total" class="time">0:00</span>
+    </div>
+
+    <div class="np-controls">
+      <button id="np-prev-btn" class="ctrl-btn" title="Previous">⏮</button>
+      <button id="np-play-pause-btn" class="ctrl-btn ctrl-btn-main np-main" title="Play/Pause">▶</button>
+      <button id="np-next-btn" class="ctrl-btn" title="Next">⏭</button>
+    </div>
+
+    <div class="owl-eyes np-eyes" id="np-owl-eyes" aria-hidden="true">
+      <span class="owl-eye"><span class="owl-eye-core"></span></span>
+      <span class="owl-eye"><span class="owl-eye-core"></span></span>
+    </div>
+
+    <button id="np-output-btn" class="np-output-btn hidden" title="Choose playback device">🔊 This device</button>
+  </div>
+
+  <!-- Output device picker popover -->
+  <div id="device-picker" class="playlist-picker hidden">
+    <div class="playlist-picker-header">Play on</div>
+    <ul id="device-picker-list"></ul>
+  </div>
+
+  <!-- Persistent player bar -->
+  <footer class="player-bar" id="player-bar">
+    <div class="player-track" id="player-track" title="Open full screen">
+      <img id="player-thumb" class="player-thumb" alt="" />
+      <div class="player-meta">
+        <span id="player-title" class="player-title">Nothing playing</span>
+        <span id="player-artist" class="player-artist">—</span>
+      </div>
+    </div>
+
+    <div class="player-center">
+      <!-- Signature element: owl-eye equalizer, glows/pulses while playing -->
+      <div class="owl-eyes" id="owl-eyes" aria-hidden="true">
+        <span class="owl-eye"><span class="owl-eye-core"></span></span>
+        <span class="owl-eye"><span class="owl-eye-core"></span></span>
+      </div>
+      <div class="player-controls">
+        <button id="prev-btn" class="ctrl-btn" title="Previous">⏮</button>
+        <button id="play-pause-btn" class="ctrl-btn ctrl-btn-main" title="Play/Pause">▶</button>
+        <button id="next-btn" class="ctrl-btn" title="Next">⏭</button>
+      </div>
+      <div class="player-progress">
+        <span id="time-current" class="time">0:00</span>
+        <input type="range" id="seek-bar" class="seek-input" min="0" max="100" value="0" />
+        <span id="time-total" class="time">0:00</span>
+      </div>
+    </div>
+
+    <div class="player-right">
+      <button id="add-current-btn" class="icon-btn" title="Add to playlist">＋</button>
+    </div>
+  </footer>
+
+</div>
+
+<!-- Generic app modal — replaces browser prompt()/alert()/confirm() -->
+<div id="app-modal" class="app-modal hidden">
+  <div class="app-modal-card">
+    <h2 id="app-modal-title" class="app-modal-title"></h2>
+    <p id="app-modal-message" class="hint hidden"></p>
+    <input type="text" id="app-modal-input" class="app-modal-input hidden" />
+    <div class="app-modal-actions">
+      <button id="app-modal-cancel" class="btn-ghost">Cancel</button>
+      <button id="app-modal-confirm" class="btn-primary btn-sm">OK</button>
+    </div>
+  </div>
+</div>
+
+<audio id="audio" preload="none"></audio>
+
+<script src="js/app.js"></script>
+</body>
+</html>
