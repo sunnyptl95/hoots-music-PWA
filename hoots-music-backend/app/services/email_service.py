@@ -53,12 +53,12 @@ def _template(title: str, body_html: str, button_text: str = "", button_url: str
             {button_text}
           </a>
         </td></tr>
-        """
-        # <tr><td align="center" style="padding-top:6px;">
-        #   <p style="font-family:Arial,sans-serif;font-size:11px;color:#565d73;word-break:break-all;">
-        #     Or paste this link: <a href="{button_url}" style="color:#8b5cf6;">{button_url}</a>
-        #   </p>
-        # </td></tr>
+        <tr><td align="center" style="padding-top:6px;">
+          <p style="font-family:Arial,sans-serif;font-size:11px;color:#565d73;word-break:break-all;">
+            Or paste this link: <a href="{button_url}" style="color:#8b5cf6;">{button_url}</a>
+          </p>
+        </td></tr>
+                """
 
     return f"""
 <html>

@@ -1,6 +1,7 @@
 // ============ CONFIG ============
 // Point this at your backend. Update after you deploy (e.g. https://your-app.onrender.com)
-const API_BASE = "http://localhost:8000";
+//const API_BASE = "http://localhost:8000";
+const API_BASE = "https://hoots-music-backend.onrender.com";
 
 // ============ STATE ============
 let token = localStorage.getItem("owlest_token") || null;
