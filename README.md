@@ -142,7 +142,7 @@ hoots-music/
 ## 1. Clone the repository
 
 ```bash
-git clone https://github.com/sunnyptl95/hoots-music.git
+git clone https://github.com/sunnyptl95/hoots-music-PWA.git
 
 cd hoots-music
 ```
