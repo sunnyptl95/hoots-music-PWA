@@ -1,3 +1,6 @@
+<img width="1920" height="1020" alt="image" src="https://github.com/user-attachments/assets/d4967e42-2e98-4343-94d9-d6a20171ac99" />
+
+
 # 🦉 Hoots Music
 
 ### A modern, self-hosted music streaming platform built for the web.
